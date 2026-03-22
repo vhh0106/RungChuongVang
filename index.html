@@ -179,6 +179,7 @@
                 </div>
 
                 <div class="answers-grid" id="answers-grid"></div>
+                <div class="answer-feedback hidden" id="answer-feedback" aria-live="polite"></div>
               </div>
 
               <section class="summary-screen hidden" id="summary-screen">
@@ -226,7 +227,7 @@
                 <button class="ghost-button" id="previous-question-button">
                   Previous
                 </button>
-                <button class="ghost-button" id="next-question-button">Next</button>
+                <button class="primary-button" id="next-question-button">Next</button>
                 <button class="ghost-button" id="show-summary-button">End Slide</button>
               </div>
 
@@ -238,8 +239,6 @@
                 <button class="ghost-button" id="toggle-answer-button">
                   Show Answer
                 </button>
-                <button class="ghost-button" id="mark-score-button">Add Score</button>
-                <button class="ghost-button" id="clear-score-button">Remove Score</button>
               </div>
             </div>
           </div>
@@ -511,10 +510,10 @@
     </template>
 
     <template id="answer-card-template">
-      <div class="answer-card">
+      <button class="answer-card" type="button">
         <span class="answer-letter">A</span>
-        <p class="answer-text"></p>
-      </div>
+        <span class="answer-text"></span>
+      </button>
     </template>
 
     <script src="script.js"></script>

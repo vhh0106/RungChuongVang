@@ -88,6 +88,7 @@ const defaultState = {
       timer: 20,
       answers: ["Hanoi", "Hue", "Da Nang", "Can Tho"],
       correctIndex: 0,
+      selectedIndex: null,
       asked: false,
       awarded: false,
     },
@@ -99,6 +100,7 @@ const defaultState = {
       timer: 25,
       answers: ["Zither", "Bronze drum", "Trumpet", "Bamboo flute"],
       correctIndex: 1,
+      selectedIndex: null,
       asked: false,
       awarded: false,
     },
@@ -110,6 +112,7 @@ const defaultState = {
       timer: 15,
       answers: ["18", "20", "22", "24"],
       correctIndex: 1,
+      selectedIndex: null,
       asked: false,
       awarded: false,
     },
@@ -189,6 +192,7 @@ const elements = {
   questionVideo: document.getElementById("question-video"),
   questionYoutube: document.getElementById("question-youtube"),
   answersGrid: document.getElementById("answers-grid"),
+  answerFeedback: document.getElementById("answer-feedback"),
   newQuestionButton: document.getElementById("new-question-button"),
   duplicateQuestionButton: document.getElementById("duplicate-question-button"),
   moveUpButton: document.getElementById("move-up-button"),
@@ -200,8 +204,6 @@ const elements = {
   toggleAnswerButton: document.getElementById("toggle-answer-button"),
   timerToggleButton: document.getElementById("timer-toggle-button"),
   resetTimerButton: document.getElementById("reset-timer-button"),
-  markScoreButton: document.getElementById("mark-score-button"),
-  clearScoreButton: document.getElementById("clear-score-button"),
   fullscreenButton: document.getElementById("fullscreen-button"),
   musicToggleButton: document.getElementById("music-toggle-button"),
   closeSummaryButton: document.getElementById("close-summary-button"),
@@ -458,14 +460,6 @@ function bindEvents() {
     renderPresentation({ preserveTimer: true, keepReveal: true, keepSummary: true });
   });
 
-  elements.markScoreButton.addEventListener("click", () => {
-    setCurrentQuestionAwarded(true);
-  });
-
-  elements.clearScoreButton.addEventListener("click", () => {
-    setCurrentQuestionAwarded(false);
-  });
-
   elements.fullscreenButton.addEventListener("click", toggleFullscreenStage);
   elements.musicToggleButton.addEventListener("click", toggleBackgroundMusic);
   elements.closeSummaryButton.addEventListener("click", closeSummary);
@@ -704,6 +698,8 @@ function renderPresentation(options = {}) {
     elements.slideQuestion.textContent = "Add a question in the builder panel to begin.";
     elements.toggleAnswerButton.textContent = "Show Answer";
     elements.answersGrid.innerHTML = "";
+    elements.answerFeedback.className = "answer-feedback hidden";
+    elements.answerFeedback.textContent = "";
     elements.mediaFrame.classList.add("hidden");
     elements.timerDisplay.textContent = `${state.settings.defaultTimer}s`;
     updateTimerArtwork(1);
@@ -721,6 +717,7 @@ function renderPresentation(options = {}) {
 
   renderMedia(question);
   renderAnswers(question);
+  renderAnswerFeedback(question);
   updateTimerDisplay();
   updateStageButtons();
 }
@@ -909,6 +906,7 @@ function getYouTubeEmbedUrl(rawValue) {
 
 function renderAnswers(question) {
   elements.answersGrid.innerHTML = "";
+  const answered = Number.isInteger(question.selectedIndex);
 
   question.answers.forEach((answer, index) => {
     const fragment = elements.answerCardTemplate.content.cloneNode(true);
@@ -918,6 +916,14 @@ function renderAnswers(question) {
 
     letter.textContent = answerLabel(index);
     text.textContent = answer || `Answer ${answerLabel(index)}`;
+    card.disabled = answered;
+
+    if (question.selectedIndex === index) {
+      card.classList.add("selected");
+      if (index !== question.correctIndex) {
+        card.classList.add("incorrect");
+      }
+    }
 
     if (revealAnswer) {
       card.classList.add("revealed");
@@ -926,8 +932,28 @@ function renderAnswers(question) {
       }
     }
 
+    if (!answered && getCurrentStage() === "question") {
+      card.addEventListener("click", () => {
+        handleAnswerSelection(index);
+      });
+    }
+
     elements.answersGrid.appendChild(fragment);
   });
+}
+
+function renderAnswerFeedback(question) {
+  if (!Number.isInteger(question.selectedIndex)) {
+    elements.answerFeedback.className = "answer-feedback hidden";
+    elements.answerFeedback.textContent = "";
+    return;
+  }
+
+  const isCorrect = question.selectedIndex === question.correctIndex;
+  elements.answerFeedback.className = `answer-feedback ${isCorrect ? "success" : "error"}`;
+  elements.answerFeedback.textContent = isCorrect
+    ? `Correct! ${state.settings.pointsPerQuestion} points were added automatically.`
+    : "Incorrect answer. The correct option is now highlighted.";
 }
 
 function renderSummary() {
@@ -1046,12 +1072,6 @@ function updateStageButtons() {
   elements.resetTimerButton.disabled = !isQuestionStage || !hasQuestion;
   elements.timerToggleButton.disabled = !isQuestionStage || !hasQuestion;
   elements.toggleAnswerButton.disabled = !isQuestionStage || !hasQuestion;
-  elements.markScoreButton.disabled =
-    !isQuestionStage || !hasQuestion || Boolean(question && question.awarded);
-  elements.clearScoreButton.disabled =
-    !isQuestionStage || !hasQuestion || !Boolean(question && question.awarded);
-  elements.markScoreButton.textContent =
-    hasQuestion && question.awarded ? "Scored" : "Add Score";
 }
 
 function updateMusicButton() {
@@ -1102,6 +1122,7 @@ function duplicateQuestion() {
 
   const duplicate = deepClone(question);
   duplicate.id = makeId();
+  duplicate.selectedIndex = null;
   duplicate.asked = false;
   duplicate.awarded = false;
   duplicate.prompt = question.prompt ? `${question.prompt} (copy)` : "Question copy";
@@ -1301,6 +1322,38 @@ function handleTimeExpired() {
     return;
   }
 
+  scheduleAutomaticStageAdvance();
+}
+
+function handleAnswerSelection(answerIndex) {
+  const question = getCurrentQuestion();
+
+  if (
+    !question ||
+    getCurrentStage() !== "question" ||
+    Number.isInteger(question.selectedIndex)
+  ) {
+    return;
+  }
+
+  clearPendingStageActions();
+  stopTimer();
+
+  question.asked = true;
+  question.selectedIndex = answerIndex;
+  question.awarded = answerIndex === question.correctIndex;
+  revealAnswer = true;
+
+  playRevealSound(REVEAL_SOUND_DELAY_MS);
+  persistStateQuietly();
+  renderEverything({ preserveTimer: true, keepReveal: true, keepSummary: true });
+
+  if (state.settings.autoAdvance) {
+    scheduleAutomaticStageAdvance();
+  }
+}
+
+function scheduleAutomaticStageAdvance() {
   scheduleStageAdvance(() => {
     if (state.settings.useQuestionBoard) {
       if (getUnaskedQuestionIndices().length) {
@@ -1460,6 +1513,7 @@ function restartQuiz() {
   clearPendingStageActions();
   stopTimer();
   state.questions.forEach((question) => {
+    question.selectedIndex = null;
     question.asked = false;
     question.awarded = false;
   });
@@ -1572,16 +1626,6 @@ function handleQuestionMediaUpload(event) {
   };
 
   reader.readAsDataURL(file);
-}
-
-function setCurrentQuestionAwarded(awarded) {
-  const question = getCurrentQuestion();
-  if (!question || getCurrentStage() !== "question") {
-    return;
-  }
-
-  question.awarded = awarded;
-  persistAndRender({ preserveTimer: true, keepReveal: true, keepSummary: true });
 }
 
 function scheduleStageAdvance(callback, delay) {
@@ -1993,6 +2037,7 @@ function mapExcelRowsToQuestions(rows) {
         correctIndex: parseCorrectAnswerValue(
           getExcelCellValue(row, columns.correctAnswer),
         ),
+        selectedIndex: null,
         asked: false,
         awarded: parseAwardedValue(getExcelCellValue(row, columns.awarded)),
       };
@@ -2229,6 +2274,9 @@ function sanitizeQuestion(question, defaultTimer) {
     timer: clampNumber(question && question.timer, 5, 300, defaultTimer),
     answers: answers.map((answer) => String(answer || "")),
     correctIndex: clampNumber(question && question.correctIndex, 0, 3, 0),
+    selectedIndex: Number.isInteger(question && question.selectedIndex)
+      ? clampNumber(question.selectedIndex, 0, 3, 0)
+      : null,
     asked: Boolean(question && question.asked),
     awarded: Boolean(question && question.awarded),
   };
@@ -2253,6 +2301,7 @@ function createBlankQuestion() {
     timer: state.settings.defaultTimer,
     answers: ["", "", "", ""],
     correctIndex: 0,
+    selectedIndex: null,
     asked: false,
     awarded: false,
   };

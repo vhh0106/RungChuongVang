@@ -253,6 +253,7 @@ video {
 .inline-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
 }
 
@@ -349,6 +350,7 @@ video {
   position: relative;
   z-index: 1;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 14px;
@@ -857,15 +859,30 @@ video {
   border: 1px solid rgba(133, 91, 6, 0.1);
   box-shadow: 0 14px 24px rgba(87, 72, 36, 0.07);
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  text-align: left;
 }
 
 .answer-card:hover {
   transform: translateY(-2px);
 }
 
+.answer-card:disabled {
+  cursor: not-allowed;
+}
+
+.answer-card.selected {
+  border-color: rgba(21, 101, 192, 0.34);
+  box-shadow: 0 16px 28px rgba(21, 101, 192, 0.12);
+}
+
 .answer-card.correct {
   background: linear-gradient(135deg, rgba(231, 255, 239, 0.98), rgba(212, 249, 224, 0.92));
   border-color: rgba(35, 128, 78, 0.34);
+}
+
+.answer-card.incorrect {
+  background: linear-gradient(135deg, rgba(255, 242, 238, 0.98), rgba(255, 224, 218, 0.94));
+  border-color: rgba(195, 58, 40, 0.28);
 }
 
 .answer-card.revealed:not(.correct) {
@@ -886,9 +903,35 @@ video {
 }
 
 .answer-text {
+  display: block;
   margin: 0;
   font-size: clamp(1rem, 1.8vw, 1.3rem);
   line-height: 1.55;
+}
+
+.answer-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(133, 91, 6, 0.12);
+  font-weight: 700;
+  text-align: center;
+}
+
+.answer-feedback.success {
+  background: rgba(231, 255, 239, 0.96);
+  border-color: rgba(35, 128, 78, 0.24);
+  color: var(--success);
+}
+
+.answer-feedback.error {
+  background: rgba(255, 242, 238, 0.96);
+  border-color: rgba(195, 58, 40, 0.2);
+  color: var(--danger);
 }
 
 .summary-screen {

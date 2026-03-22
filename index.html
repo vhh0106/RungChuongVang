@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Golden Bell Challenge</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-left"></div>
+    <div class="background-orb orb-right"></div>
+
+    <div class="app-shell">
+      <header class="hero-banner">
+        <div class="hero-copy">
+          <p class="eyebrow">Knowledge game show for primary students</p>
+          <h1 id="hero-title">Golden Bell Challenge</h1>
+          <p id="hero-subtitle">
+            Build a question set, set timers, and present each question like a
+            mini classroom game show.
+          </p>
+        </div>
+
+        <div class="hero-bell" aria-hidden="true">
+          <svg viewBox="0 0 240 240" role="img">
+            <defs>
+              <linearGradient id="bellGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff4bf" />
+                <stop offset="45%" stop-color="#ffcf4d" />
+                <stop offset="100%" stop-color="#e29a00" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M120 28c-27.6 0-50 22.4-50 50v22.8c0 11.7-4.7 23-13 31.3l-12.4 12.4c-5 5-1.4 13.5 5.7 13.5h139.4c7.1 0 10.7-8.5 5.7-13.5L183 132c-8.3-8.3-13-19.6-13-31.3V78c0-27.6-22.4-50-50-50Z"
+              fill="url(#bellGradient)"
+              stroke="#9a5a00"
+              stroke-width="7"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M84 158h72c0 20.6-16.7 37.3-37.3 37.3h-1.4c-20.6 0-37.3-16.7-37.3-37.3Z"
+              fill="#b96f00"
+              opacity="0.2"
+            />
+            <circle cx="120" cy="168" r="13" fill="#8f4f00" />
+            <path
+              d="M92 42c8.3-5.3 18.3-8.3 28-8.3"
+              fill="none"
+              stroke="#fff7d9"
+              stroke-width="8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <div class="bell-ribbon">Learn - Believe - Shine</div>
+        </div>
+      </header>
+
+      <nav class="mode-switcher" aria-label="Switch area">
+        <button class="mode-button active" data-view="presentation-view">
+          Presentation
+        </button>
+        <button class="mode-button" data-view="editor-view">
+          Question Builder
+        </button>
+      </nav>
+
+      <main class="workspace-grid">
+        <section class="view-panel presentation-view active" id="presentation-view">
+          <div class="view-header">
+            <div>
+              <p class="panel-label">Part 1</p>
+              <h2>Presentation Stage</h2>
+              <p class="panel-description">
+                Show each question in a large slide format with a countdown and
+                answer reveal.
+              </p>
+            </div>
+
+            <div class="stage-actions">
+              <button class="ghost-button" id="fullscreen-button">Fullscreen</button>
+            </div>
+          </div>
+
+          <div class="presentation-stage">
+            <div class="stage-topbar">
+              <div class="badge-stack">
+                <span class="stage-badge" id="question-order-badge">Question 1 / 3</span>
+                <span class="stage-badge accent" id="question-type-badge">Question</span>
+                <span class="stage-badge success" id="score-badge">Score 0</span>
+              </div>
+
+              <div class="stage-meta-controls">
+                <button class="ghost-button small" id="music-toggle-button">
+                  Play Music
+                </button>
+
+                <div class="timer-widget" id="timer-widget">
+                  <div class="hourglass" aria-hidden="true">
+                    <div class="hourglass-shell">
+                      <div class="sand sand-top"></div>
+                      <div class="sand sand-bottom"></div>
+                    </div>
+                  </div>
+                  <div class="timer-copy">
+                    <span class="timer-label" id="timer-label">Hourglass</span>
+                    <strong id="timer-display">30s</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="question-slide">
+              <div class="slide-watermark" aria-hidden="true">
+                <svg viewBox="0 0 120 120" role="img">
+                  <path
+                    d="M60 14c-13.3 0-24 10.7-24 24v11c0 5.6-2.2 10.9-6.2 14.9l-6 6c-2.4 2.4-.7 6.6 2.7 6.6h67c3.5 0 5.2-4.2 2.7-6.6l-6-6C85.2 59.9 83 54.6 83 49V38c0-13.3-10.7-24-24-24Z"
+                    fill="#f9cf2d"
+                    opacity="0.32"
+                  />
+                  <circle cx="60" cy="82" r="6" fill="#f9cf2d" opacity="0.45" />
+                </svg>
+              </div>
+
+              <section class="special-screen intro-screen hidden" id="intro-screen">
+                <div class="special-screen-copy">
+                  <span class="question-tag">Opening Slide</span>
+                  <h3 id="intro-program-title">Golden Bell Challenge</h3>
+                  <p id="intro-program-subtitle">
+                    A fun review game that helps primary students strengthen
+                    their knowledge through exciting quiz questions.
+                  </p>
+                </div>
+
+                <div class="rules-card">
+                  <div class="rules-head">
+                    <span class="rules-badge">Rules</span>
+                    <h4>Game Rules</h4>
+                  </div>
+                  <div class="rules-list" id="rules-list"></div>
+                </div>
+              </section>
+
+              <section class="special-screen board-screen hidden" id="board-screen">
+                <div class="special-screen-copy">
+                  <span class="question-tag">Question Board</span>
+                  <h3>Pick a Question</h3>
+                  <p id="board-note">
+                    Click a number tile to open that exact question, or use the
+                    random button to choose one that has not been opened yet.
+                  </p>
+                </div>
+
+                <div class="board-actions">
+                  <button class="ghost-button" id="random-question-button" type="button">
+                    Random Question
+                  </button>
+                </div>
+
+                <div class="question-board-grid" id="question-board-grid"></div>
+              </section>
+
+              <div class="question-content">
+                <div class="question-copy">
+                  <span class="question-tag" id="question-tag">Knowledge Question</span>
+                  <h3 id="slide-question">The question will appear here</h3>
+                </div>
+
+                <div class="media-frame hidden" id="media-frame">
+                  <img id="question-image" alt="Question illustration" />
+                  <video id="question-video" controls playsinline></video>
+                  <iframe
+                    id="question-youtube"
+                    class="hidden"
+                    title="YouTube video for the question"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen
+                  ></iframe>
+                </div>
+
+                <div class="answers-grid" id="answers-grid"></div>
+              </div>
+
+              <section class="summary-screen hidden" id="summary-screen">
+                <div class="summary-head">
+                  <span class="question-tag">Ending Slide</span>
+                  <h3 id="summary-title">End of Program</h3>
+                  <p id="summary-note">
+                    A quick recap of the full journey and total score.
+                  </p>
+                </div>
+
+                <div class="summary-cards">
+                  <article class="summary-card">
+                    <span>Total Score</span>
+                    <strong id="summary-total-score">0</strong>
+                    <small id="summary-points-note">0 correct questions</small>
+                  </article>
+                  <article class="summary-card">
+                    <span>Scored Questions</span>
+                    <strong id="summary-correct-count">0</strong>
+                    <small id="summary-total-count">Out of 0 questions</small>
+                  </article>
+                  <article class="summary-card">
+                    <span>Points Per Question</span>
+                    <strong id="summary-score-per-question">10</strong>
+                    <small>Points awarded for each marked question</small>
+                  </article>
+                </div>
+
+                <div class="summary-list" id="summary-list"></div>
+
+                <div class="summary-actions">
+                  <button class="ghost-button" id="close-summary-button">
+                    Back to Slide
+                  </button>
+                  <button class="primary-button" id="restart-quiz-button">
+                    Restart from Beginning
+                  </button>
+                </div>
+              </section>
+            </div>
+
+            <div class="stage-footer">
+              <div class="stage-navigation">
+                <button class="ghost-button" id="previous-question-button">
+                  Previous
+                </button>
+                <button class="ghost-button" id="next-question-button">Next</button>
+                <button class="ghost-button" id="show-summary-button">End Slide</button>
+              </div>
+
+              <div class="stage-navigation">
+                <button class="ghost-button" id="reset-timer-button">Reset Timer</button>
+                <button class="primary-button" id="timer-toggle-button">
+                  Start Timer
+                </button>
+                <button class="ghost-button" id="toggle-answer-button">
+                  Show Answer
+                </button>
+                <button class="ghost-button" id="mark-score-button">Add Score</button>
+                <button class="ghost-button" id="clear-score-button">Remove Score</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-panel editor-view" id="editor-view">
+          <div class="view-header">
+            <div>
+              <p class="panel-label">Part 2</p>
+              <h2>Program Builder</h2>
+              <p class="panel-description">
+                Create new questions, edit content, media, and countdown time
+                for each slide.
+              </p>
+            </div>
+
+            <div class="stage-actions">
+              <a
+                class="ghost-button button-link"
+                href="mau-cau-hoi-rung-chuong-vang.xlsx"
+                download
+              >
+                Excel Template
+              </a>
+              <button class="ghost-button" id="import-excel-button">Import Excel</button>
+              <button class="primary-button" id="new-question-button">
+                Add Question
+              </button>
+            </div>
+          </div>
+
+          <div class="editor-layout">
+            <aside class="editor-sidebar">
+              <div class="sidebar-card settings-card">
+                <h3>Program Settings</h3>
+                <label class="field">
+                  <span>Title</span>
+                  <input id="program-title-input" type="text" />
+                </label>
+                <label class="field">
+                  <span>Short Description</span>
+                  <textarea id="program-subtitle-input" rows="3"></textarea>
+                </label>
+                <label class="field">
+                  <span>Rules (one item per line)</span>
+                  <textarea id="rules-input" rows="6"></textarea>
+                </label>
+                <label class="field inline-field">
+                  <span>Default Time</span>
+                  <input id="default-timer-input" type="number" min="5" max="300" />
+                </label>
+                <label class="checkbox-field">
+                  <input id="question-board-input" type="checkbox" />
+                  <span>Enable the question board before opening questions</span>
+                </label>
+                <label class="checkbox-field">
+                  <input id="random-question-input" type="checkbox" />
+                  <span>Show the random question button on the board</span>
+                </label>
+                <label class="checkbox-field">
+                  <input id="auto-advance-input" type="checkbox" />
+                  <span>Auto move to the next question when time is up</span>
+                </label>
+                <label class="field">
+                  <span>Ending Slide Title</span>
+                  <input id="ending-title-input" type="text" />
+                </label>
+                <label class="field">
+                  <span>Ending Slide Message</span>
+                  <textarea id="ending-message-input" rows="3"></textarea>
+                </label>
+              </div>
+
+              <div class="sidebar-card enhancements-card">
+                <div class="section-title-row">
+                  <h3>Upgrade Panel</h3>
+                  <span id="enhancement-pill">Audio + Score</span>
+                </div>
+
+                <label class="field inline-field">
+                  <span>Points Per Question</span>
+                  <input id="points-per-question-input" type="number" min="1" max="100" />
+                </label>
+
+                <label class="checkbox-field">
+                  <input id="auto-reveal-answer-input" type="checkbox" />
+                  <span>Auto reveal the answer when time is up</span>
+                </label>
+
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Background Volume</span>
+                    <input id="background-volume-input" type="range" min="0" max="100" step="5" />
+                  </label>
+
+                  <label class="field">
+                    <span>Effect Volume</span>
+                    <input id="effect-volume-input" type="range" min="0" max="100" step="5" />
+                  </label>
+                </div>
+
+                <label class="field">
+                  <span>Background Music (URL or path)</span>
+                  <input
+                    id="background-sound-input"
+                    type="text"
+                    placeholder="Example: assets/background-music.mp3"
+                  />
+                </label>
+                <label class="field">
+                  <span>Upload Background Music</span>
+                  <input id="background-sound-file-input" type="file" accept="audio/*" />
+                </label>
+
+                <label class="field">
+                  <span>Answer Reveal Sound</span>
+                  <input
+                    id="reveal-sound-input"
+                    type="text"
+                    placeholder="Example: assets/correct-answer.mp3"
+                  />
+                </label>
+                <label class="field">
+                  <span>Upload Answer Sound</span>
+                  <input id="reveal-sound-file-input" type="file" accept="audio/*" />
+                </label>
+
+                <label class="field">
+                  <span>Time-Up Sound</span>
+                  <input
+                    id="timeout-sound-input"
+                    type="text"
+                    placeholder="Example: assets/time-up.mp3"
+                  />
+                </label>
+                <label class="field">
+                  <span>Upload Time-Up Sound</span>
+                  <input id="timeout-sound-file-input" type="file" accept="audio/*" />
+                </label>
+
+                <p class="field-note">
+                  Background music can be started from the presentation screen.
+                  Some browsers require a user click before audio can play.
+                </p>
+              </div>
+
+              <div class="sidebar-card question-list-card">
+                <div class="section-title-row">
+                  <h3>Question List</h3>
+                  <span id="question-count-pill">3 questions</span>
+                </div>
+                <div class="question-list" id="question-list"></div>
+              </div>
+            </aside>
+
+            <section class="editor-form-card">
+              <div class="section-title-row">
+                <h3>Edit Selected Question</h3>
+                <div class="inline-actions">
+                  <button class="ghost-button small" id="duplicate-question-button">
+                    Duplicate
+                  </button>
+                  <button class="ghost-button small" id="move-up-button">Move Up</button>
+                  <button class="ghost-button small" id="move-down-button">Move Down</button>
+                  <button class="ghost-button small danger" id="delete-question-button">
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              <form id="question-form" class="question-form">
+                <label class="field">
+                  <span>Question Content</span>
+                  <textarea id="question-text-input" rows="4"></textarea>
+                </label>
+
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Content Type</span>
+                    <select id="question-type-input">
+                      <option value="text">Text only</option>
+                      <option value="image">With image</option>
+                      <option value="video">With video</option>
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span>Question Time (seconds)</span>
+                    <input id="question-timer-input" type="number" min="5" max="300" />
+                  </label>
+                </div>
+
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Media Path or URL</span>
+                    <input
+                      id="question-media-input"
+                      type="text"
+                      placeholder="Example: assets/question-1.jpg, video/question-2.mp4 or a YouTube link"
+                    />
+                  </label>
+
+                  <label class="field">
+                    <span>Quick Media Upload</span>
+                    <input id="question-file-input" type="file" accept="image/*,video/*" />
+                  </label>
+                </div>
+
+                <p class="field-note">
+                  You can paste a link, use a relative path inside this project
+                  folder, or upload a small file. Video questions also support
+                  YouTube links. For large files, especially videos, using a
+                  file path will keep the presentation more stable.
+                </p>
+
+                <div class="answers-editor">
+                  <div class="section-title-row">
+                    <h3>Four Answer Choices</h3>
+                    <label class="field compact-select">
+                      <span>Correct Answer</span>
+                      <select id="correct-answer-input">
+                        <option value="0">A</option>
+                        <option value="1">B</option>
+                        <option value="2">C</option>
+                        <option value="3">D</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div class="answer-fields">
+                    <label class="field answer-field">
+                      <span>A</span>
+                      <input id="answer-0-input" type="text" />
+                    </label>
+                    <label class="field answer-field">
+                      <span>B</span>
+                      <input id="answer-1-input" type="text" />
+                    </label>
+                    <label class="field answer-field">
+                      <span>C</span>
+                      <input id="answer-2-input" type="text" />
+                    </label>
+                    <label class="field answer-field">
+                      <span>D</span>
+                      <input id="answer-3-input" type="text" />
+                    </label>
+                  </div>
+                </div>
+              </form>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <input id="excel-file-input" type="file" accept=".xlsx" hidden />
+      <audio id="background-audio" loop preload="auto"></audio>
+      <audio id="reveal-audio" preload="auto"></audio>
+      <audio id="timeout-audio" preload="auto"></audio>
+    </div>
+
+    <template id="question-list-item-template">
+      <button class="question-list-item" type="button">
+        <span class="question-index">01</span>
+        <span class="question-list-copy">
+          <strong class="question-list-title"></strong>
+          <small class="question-list-meta"></small>
+        </span>
+      </button>
+    </template>
+
+    <template id="answer-card-template">
+      <div class="answer-card">
+        <span class="answer-letter">A</span>
+        <p class="answer-text"></p>
+      </div>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
